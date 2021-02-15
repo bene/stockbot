@@ -5,6 +5,7 @@
 # Configuration
 .env.*.local
 .env.local
+.env
 
 # macOS generated files
 .DS_Store

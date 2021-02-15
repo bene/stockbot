@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "inlineSourceMap": true,
+    "isolatedModules": true,
+    "lib": ["deno.window"],
+    "module": "esnext",
+    "strict": true,
+    "target": "esnext",
+    "useDefineForClassFields": true
+  }
+}
