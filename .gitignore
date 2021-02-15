@@ -1,0 +1,11 @@
+# IDE
+/.idea/
+/.vscode/
+
+# Configuration
+.env.*.local
+.env.local
+
+# macOS generated files
+.DS_Store
+.DS_Store?
