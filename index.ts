@@ -1,5 +1,5 @@
 import { RenderSide, StockStatus, Store } from "./stores/Store.ts";
-import { maxLineLength, stores } from "./src/environment.ts";
+import {interval, maxLineLength, stores} from "./src/environment.ts";
 import { log, logIssue } from "./src/logger.ts";
 import { delay } from "./src/utils.ts";
 
@@ -13,7 +13,7 @@ async function loop() {
   while (true) {
     console.log("".padStart(maxLineLength, "="));
     await Promise.all(stores.map(async (s: Store) => await check(s)));
-    await delay(10 * 1000);
+    await delay(interval * 1000);
   }
 }
 

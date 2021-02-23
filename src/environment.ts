@@ -12,6 +12,8 @@ export let stores: Array<Store> = [];
 export let maxLineLength = 0;
 export let maxStoreNameLength = 0;
 
+export let interval = 10;
+
 // Register stores
 stores.push(Conrad);
 stores.push(Libro);
@@ -36,6 +38,11 @@ if (!!Deno.env.get("DISCORD_WEBHOOK_URL")) {
   notificationServices.push(new Discord(Deno.env.get("DISCORD_WEBHOOK_URL")!));
 }
 
+// Get config
+if (!!Deno.env.get("INTERVAL")) {
+  interval = parseInt(Deno.env.get("INTERVAL")!);
+}
+
 // Print banner
 console.log(`
    _____ __             __   ____        __ 
@@ -56,6 +63,7 @@ console.log(
 );
 
 console.log(`Stores: ${stores.map((ns) => ns.name).join(", ")}`);
+console.log(`Interval: ${interval}`);
 
 // Set maxLineLength value
 stores.forEach((s) => {
