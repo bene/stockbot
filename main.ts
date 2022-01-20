@@ -1,13 +1,7 @@
 import { RenderSide, StockStatus, Store } from "./stores/Store.ts";
-import {interval, maxLineLength, stores} from "./src/environment.ts";
+import { interval, maxLineLength, stores } from "./src/environment.ts";
 import { log, logIssue } from "./src/logger.ts";
 import { delay } from "./src/utils.ts";
-
-function main() {
-  loop().catch((err) => {
-    console.error(err);
-  });
-}
 
 async function loop() {
   while (true) {
@@ -51,4 +45,4 @@ async function check(store: Store) {
   }
 }
 
-main();
+await loop();

@@ -2,11 +2,34 @@ import { StockStatus, Store } from "../../stores/Store.ts";
 import { INotificationService } from "./NotificationService.ts";
 
 export class Discord implements INotificationService {
-  name: string = "Discord";
+  name = "Discord";
   webhookURL: string;
 
   constructor(webhookURL: string) {
     this.webhookURL = webhookURL;
+  }
+
+  sendRawMessage(message: string): void {
+    fetch(this.webhookURL, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        username: "StockBot",
+        embeds: [
+          {
+            color: "3447003",
+            fields: [
+              {
+                name: "Info",
+                value: message,
+              },
+            ],
+          },
+        ],
+      }),
+    });
   }
 
   notify(status: StockStatus, store: Store): void {

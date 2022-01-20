@@ -18,14 +18,14 @@ deno run -A index.ts
 Or create a binary:
 
 ```
-deno compile --unstable -A index.ts
+deno compile -A index.ts
 ```
 
 ## Development
 
 To add a new store, create a file in the `stores` folder. Then register the new
 store in the `src/environment.ts` file. As long as there are no docs, have a
-look at the `stores/Conrad.ts` store.
+look at the `stores/Conrad.ts` store as an example.
 
 Make sure to use Deno's formatter before opening a PR:
 

@@ -2,22 +2,24 @@ import "https://deno.land/x/dotenv/load.ts";
 
 import { INotificationService } from "./notification/NotificationService.ts";
 import { RenderSide, StockStatus, Store } from "../stores/Store.ts";
+import { Discord } from "./notification/Discord.ts";
+
 import { Conrad } from "../stores/Conrad.ts";
 import { Libro } from "../stores/Libro.ts";
 import { Electronic4You } from "../stores/Electronic4You.ts";
-import { Discord } from "./notification/Discord.ts";
+import { MediaMarkt } from "../stores/MediaMarkt.ts";
 
-export let notificationServices: Array<INotificationService> = [];
+export const notificationServices: Array<INotificationService> = [];
 export let stores: Array<Store> = [];
 export let maxLineLength = 0;
 export let maxStoreNameLength = 0;
-
 export let interval = 10;
 
 // Register stores
 stores.push(Conrad);
 stores.push(Libro);
 stores.push(Electronic4You);
+stores.push(MediaMarkt);
 
 // TODO: Implement client side rendered stores via Chromium
 stores = stores.filter((s) => {
@@ -34,12 +36,15 @@ stores = stores.filter((s) => {
 });
 
 // Register notification services
-if (!!Deno.env.get("DISCORD_WEBHOOK_URL")) {
+if (Deno.env.get("DISCORD_WEBHOOK_URL")) {
   notificationServices.push(new Discord(Deno.env.get("DISCORD_WEBHOOK_URL")!));
+  notificationServices.forEach((ns) =>
+    ns.sendRawMessage("StockBot now running.")
+  );
 }
 
 // Get config
-if (!!Deno.env.get("INTERVAL")) {
+if (Deno.env.get("INTERVAL")) {
   interval = parseInt(Deno.env.get("INTERVAL")!);
 }
 
