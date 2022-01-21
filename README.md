@@ -12,13 +12,13 @@ names you need. To start the bot install [Deno](https://deno.land/#installation)
 and run:
 
 ```
-deno run -A index.ts
+deno run -A main.ts
 ```
 
 Or create a binary:
 
 ```
-deno compile -A index.ts
+deno compile -A main.ts
 ```
 
 ## Development
@@ -31,6 +31,11 @@ Make sure to use Deno's formatter before opening a PR:
 
 ```
 deno fmt
+```
+
+### Docker
+```
+docker build -t bene/stockbot:latest .
 ```
 
 <div style="text-align: center;width: 100%; margin-top: 25px">Made with ☕️ by bene.</div>
