@@ -14,6 +14,8 @@ export let stores: Array<Store> = [];
 export let maxLineLength = 0;
 export let maxStoreNameLength = 0;
 export let interval = 10;
+export let notification_interval = 0;
+export let notification_interval_counter = 0;
 
 // Register stores
 stores.push(Conrad);
@@ -37,15 +39,35 @@ stores = stores.filter((s) => {
 
 // Register notification services
 if (Deno.env.get("DISCORD_WEBHOOK_URL")) {
-  notificationServices.push(new Discord(Deno.env.get("DISCORD_WEBHOOK_URL")!));
+  const discord = new Discord(Deno.env.get("DISCORD_WEBHOOK_URL")!);
+  notificationServices.push(discord);
   notificationServices.forEach((ns) =>
     ns.sendRawMessage("StockBot now running.")
   );
+  /**
+   * STATUS UPDATE TO GET "STILL RUNNING" MESSAGE
+   * To update every n minutes, set notification interval to:
+   * n * (60/CRAWL_INTERVAL)
+   */
+  if (Deno.env.get("NOTIFICATION_INTERVAL")) {
+    notification_interval = parseInt(Deno.env.get("NOTIFICATION_INTERVAL")!);
+    if (notification_interval > 0) {
+      notification_interval_counter++;
+      if (notification_interval_counter % notification_interval === 0) {
+        notificationServices.push(discord);
+        notificationServices.forEach((ns) =>
+          ns.sendRawMessage(
+            "Stockbot still running. Checkout more great projects like StockBot here: https://www.bene.dev/",
+          )
+        );
+      }
+    }
+  }
 }
 
 // Get config
-if (Deno.env.get("INTERVAL")) {
-  interval = parseInt(Deno.env.get("INTERVAL")!);
+if (Deno.env.get("CRAWL_INTERVAL")) {
+  interval = parseInt(Deno.env.get("CRAWL_INTERVAL")!);
 }
 
 // Print banner
