@@ -1,15 +1,20 @@
-import { RenderSide, Store } from "./Store.ts";
+import { FetchMode, RenderSide, Store } from "../src/Store.ts";
 
-export const Libro: Store = {
+const Libro: Store = {
   name: "Libro",
   renderSide: RenderSide.Server,
-  link: "https://www.libro.at/service/ps5/",
-  matcher: {
-    outOfStock: [
-      {
-        contains:
-          `<strong>Vielen Dank an alle, die eine PlayStation 5 bestellt haben.`,
+  fetchMode: FetchMode.Parallel,
+  products: [
+    {
+      name: "PlayStation",
+      url: "https://www.libro.at/service/ps5/",
+      matcher: (content: string) => {
+        return !content.includes(
+          "Vielen Dank an alle, die eine PlayStation 5 bestellt haben."
+        );
       },
-    ],
-  },
+    },
+  ],
 };
+
+export default Libro;

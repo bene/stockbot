@@ -1,5 +1,4 @@
-import { StockStatus, Store } from "../../stores/Store.ts";
-import { INotificationService } from "./NotificationService.ts";
+import { INotificationService } from "../NotificationService.ts";
 
 export class Discord implements INotificationService {
   name = "Discord";
@@ -29,10 +28,12 @@ export class Discord implements INotificationService {
           },
         ],
       }),
+    }).catch((_) => {
+      console.log("Could not send notification via Discord.");
     });
   }
 
-  notify(status: StockStatus, store: Store): void {
+  notify(productName: string, storeName: string, url: string): void {
     fetch(this.webhookURL, {
       method: "POST",
       headers: {
@@ -42,21 +43,23 @@ export class Discord implements INotificationService {
         username: "StockBot",
         embeds: [
           {
-            color: status === StockStatus.InStock ? "1879160" : "15605837",
+            color: "1879160",
             fields: [
               {
                 name: "Store",
-                value: store.name,
+                value: storeName,
+              },
+              {
+                name: "Product",
+                value: productName,
               },
               {
                 name: "Link",
-                value: store.link,
+                value: url,
               },
               {
                 name: "Status",
-                value: status === StockStatus.InStock
-                  ? "IN STOCK"
-                  : "OUT OF STOCK",
+                value: "IN STOCK",
               },
             ],
           },
