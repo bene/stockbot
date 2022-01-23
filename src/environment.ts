@@ -47,7 +47,7 @@ if (Deno.env.get("DISCORD_WEBHOOK_URL")) {
   /**
    * STATUS UPDATE TO GET "STILL RUNNING" MESSAGE
    * To update every n minutes, set notification interval to:
-   * n * (60/interval)
+   * n * (60/CRAWL_INTERVAL)
    */
   if (Deno.env.get("NOTIFICATION_INTERVAL")) {
     notification_interval = parseInt(Deno.env.get("NOTIFICATION_INTERVAL")!);
@@ -66,8 +66,8 @@ if (Deno.env.get("DISCORD_WEBHOOK_URL")) {
 }
 
 // Get config
-if (Deno.env.get("INTERVAL")) {
-  interval = parseInt(Deno.env.get("INTERVAL")!);
+if (Deno.env.get("CRAWL_INTERVAL")) {
+  interval = parseInt(Deno.env.get("CRAWL_INTERVAL")!);
 }
 
 // Print banner
