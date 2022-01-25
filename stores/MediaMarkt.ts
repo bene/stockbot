@@ -4,6 +4,7 @@ const MediaMarkt: Store = {
   name: "MediaMarkt",
   renderSide: RenderSide.Server,
   fetchMode: FetchMode.Serial,
+  interval: 12000,
   products: [
     {
       name: "PlayStation",

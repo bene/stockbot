@@ -10,6 +10,9 @@ To configure notifications, create a `.env` file and add the variables for the
 service you want. Have a look at the `.env.example` file to get the variable
 names you need. To start the bot install [Deno](https://deno.land/#installation)
 and run:
+```
+PUPPETEER_PRODUCT=chrome deno run -A --unstable https://deno.land/x/puppeteer@9.0.2/install.ts
+```
 
 ```
 deno run -A main.ts

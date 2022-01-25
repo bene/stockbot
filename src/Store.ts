@@ -25,5 +25,5 @@ export type Store = {
   fetchMode: FetchMode;
   renderSide: RenderSide;
   products: Product[];
-  minInterval?: number;
+  interval: number;
 };

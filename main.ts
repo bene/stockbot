@@ -1,43 +1,16 @@
 import "https://deno.land/x/dotenv/load.ts";
 import { serve } from "https://deno.land/std@0.122.0/http/server.ts";
-import * as log from "https://deno.land/std@0.122.0/log/mod.ts";
 
-import { crawl } from "./crawler.ts";
+import { crawl, Response } from "./crawler.ts";
 import { Store } from "./src/Store.ts";
 
 const stores: Store[] = [];
-
-let sdtInterval = 10000;
-
-if (Deno.env.get("INTERVAL")) {
-  sdtInterval = parseInt(Deno.env.get("INTERVAL")!);
-}
-
-// Create log file
-const logsFile = `./logs/${Date.now()}.txt`;
-await Deno.mkdir("./logs", {
-  recursive: true,
-});
-//await Deno.writeTextFile(logsFile, "");
 
 // Register stores
 for await (const dirEntry of Deno.readDir("stores")) {
   const store: Store = (await import(`./stores/${dirEntry.name}`)).default;
   stores.push(store);
 }
-
-const fileHandler = new log.handlers.FileHandler("INFO", {
-  filename: logsFile,
-});
-
-await log.setup({
-  handlers: {
-    file: fileHandler,
-  },
-});
-
-log.critical("Hallo");
-fileHandler.flush();
 
 // Print banner
 console.log(`
@@ -64,32 +37,34 @@ interface CrawlRecord {
   productIndex: number;
   time: number;
   done: boolean;
+  response?: Response;
 }
 
 // Index of the last crawled product for serial mode stores
 const lastCrawledProduct: Record<string, CrawlRecord> = {};
+const totalCrawls: Record<string, number> = {};
 
 // Loop
 setInterval(() => {
-  stores.map(async (store) => {
-    const interval = Math.max(store.minInterval ?? 0, sdtInterval);
-    const now = Date.now();
+  const now = Date.now();
 
+  stores.map(async (store) => {
     if (
       !lastCrawledProduct[store.name] ||
       (lastCrawledProduct[store.name].done &&
-        lastCrawledProduct[store.name].time + interval < now)
+        lastCrawledProduct[store.name].time + store.interval < now)
     ) {
-      const lastIndex = lastCrawledProduct[store.name]?.productIndex ?? 0;
-      const nextIndex =
-        lastIndex + 1 < store.products.length ? lastIndex + 1 : 0;
-      const product = store.products[nextIndex];
       lastCrawledProduct[store.name] = {
         ...lastCrawledProduct[store.name],
         done: false,
       };
 
-      await crawl(
+      const lastIndex = lastCrawledProduct[store.name]?.productIndex ?? 0;
+      const nextIndex =
+        lastIndex + 1 < store.products.length ? lastIndex + 1 : 0;
+      const product = store.products[nextIndex];
+
+      const response = await crawl(
         product.name,
         store.name,
         product.url,
@@ -101,16 +76,53 @@ setInterval(() => {
         productIndex: nextIndex,
         time: now,
         done: true,
+        response,
       };
+      if (totalCrawls[store.name]) {
+        totalCrawls[store.name] = totalCrawls[store.name] + 1;
+      } else {
+        totalCrawls[store.name] = 1;
+      }
     }
   });
 }, 100);
 
 // Serve status page
 serve(
-  async () => {
-    const lines = await Deno.readTextFile(logsFile);
-    return new Response(new Date().toLocaleTimeString());
+  (request) => {
+    const url = new URL(request.url);
+    const [store, plain] = url.pathname.substring(1).split("/");
+    if (Object.hasOwn(lastCrawledProduct, store)) {
+      const headers = new Headers();
+      headers.set(
+        "Content-Type",
+        `${plain ? "text/plain" : "text/html"}; charset=UTF-8`
+      );
+      return new Response(lastCrawledProduct[store].response?.content, {
+        headers,
+      });
+    }
+
+    const infoResponse = Object.entries(lastCrawledProduct).map(
+      ([storeName, lastCrawl]) => {
+        const date = new Date();
+        date.setTime(lastCrawl.time);
+        return {
+          storeName: storeName,
+          totalCrawls: totalCrawls[storeName],
+          done: lastCrawl.done,
+          lastCrawl: {
+            status: lastCrawl.response?.status,
+            date: date.toLocaleString(),
+            product: stores.find((s) => s.name === storeName)?.products[
+              lastCrawl.productIndex
+            ]?.name,
+          },
+        };
+      }
+    );
+
+    return new Response(JSON.stringify(infoResponse, null, "  "));
   },
   { port: 8000 }
 );

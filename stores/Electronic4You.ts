@@ -4,6 +4,7 @@ const Electronic4You: Store = {
   name: "Electronic4You",
   renderSide: RenderSide.Server,
   fetchMode: FetchMode.Parallel,
+  interval: 10000,
   products: [
     {
       name: "PlayStation",

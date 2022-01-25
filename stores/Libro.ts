@@ -4,6 +4,7 @@ const Libro: Store = {
   name: "Libro",
   renderSide: RenderSide.Server,
   fetchMode: FetchMode.Parallel,
+  interval: 10000,
   products: [
     {
       name: "PlayStation",

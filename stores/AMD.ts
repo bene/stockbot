@@ -6,6 +6,7 @@ const Nvidia: Store = {
   name: "AMD",
   renderSide: RenderSide.Client,
   fetchMode: FetchMode.Serial,
+  interval: 10000,
   products: [
     {
       name: "RX 6000 Series",
