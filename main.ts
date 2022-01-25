@@ -1,8 +1,11 @@
 import "https://deno.land/x/dotenv/load.ts";
+import puppeteer from "https://deno.land/x/puppeteer@9.0.2/mod.ts";
 import { serve } from "https://deno.land/std@0.122.0/http/server.ts";
 
-import { crawl, Response } from "./crawler.ts";
-import { Store } from "./src/Store.ts";
+import { crawl } from "./crawler.ts";
+import { userAgent } from "./config.ts";
+import { Store, Product } from "./src/Store.ts";
+import type { Response } from "./crawler.ts";
 
 const stores: Store[] = [];
 
@@ -43,6 +46,34 @@ interface CrawlRecord {
 // Index of the last crawled product for serial mode stores
 const lastCrawledProduct: Record<string, CrawlRecord> = {};
 const totalCrawls: Record<string, number> = {};
+
+// Open every product url at least once with chrome
+async function initialOpen() {
+  const browser = await puppeteer.launch({
+    headless: false,
+  });
+
+  await Promise.allSettled(
+    stores
+      .reduce((prev, curr) => [...prev, ...curr.products], <Product[]>[])
+      .map(async (product) => {
+        const page = await browser.newPage();
+        await page.setViewport({ width: 1920, height: 1080 });
+        await page.setUserAgent(userAgent);
+        await page.goto(product.url, { waitUntil: "networkidle2" });
+        await sleep(5000);
+        await page.close();
+      })
+  );
+
+  browser.close();
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+await initialOpen();
 
 // Loop
 setInterval(() => {

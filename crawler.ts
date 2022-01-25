@@ -2,6 +2,7 @@ import puppeteer from "https://deno.land/x/puppeteer@9.0.2/mod.ts";
 
 import { RenderSide } from "./src/Store.ts";
 import { NotificationService } from "./src/NotificationService.ts";
+import { userAgent } from "./config.ts";
 
 const ns = new NotificationService();
 ns.sendRawMessage(`StockBot is running on .`);
@@ -42,9 +43,6 @@ async function getContent(
   renderSide: RenderSide,
   waitForFunction?: string
 ): Promise<Response> {
-  const userAgent =
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4469.0 Safari/537.36";
-
   console.info(`${new Date().toLocaleTimeString()} - ${url}`);
 
   if (renderSide === RenderSide.Server) {
