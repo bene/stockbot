@@ -76,7 +76,7 @@ ENV DENO_DIR /deno-dir/
 
 # --- PLACE CUSTOM COMMANDS BELOW --- #
 
-WORKDIR /root
+WORKDIR /app
 COPY . . 
 
 # https://deno.land/x/puppeteer@9.0.2#installation

@@ -7,6 +7,8 @@ import { userAgent } from "./config.ts";
 import { Store, Product } from "./src/Store.ts";
 import type { Response } from "./crawler.ts";
 
+await Deno.mkdir("./logs", { recursive: true });
+
 const stores: Store[] = [];
 
 // Register stores
@@ -49,28 +51,30 @@ const totalCrawls: Record<string, number> = {};
 
 // Open every product url at least once with chrome
 async function initialOpen() {
+  const now = Date.now();
   const browser = await puppeteer.launch({
-    headless: false,
+    args: ["--no-sandbox", "--disable-dev-shm-usage"],
   });
+
+  console.log(`Using: ${userAgent}`);
 
   await Promise.allSettled(
     stores
       .reduce((prev, curr) => [...prev, ...curr.products], <Product[]>[])
-      .map(async (product) => {
+      .map(async (product, i) => {
         const page = await browser.newPage();
         await page.setViewport({ width: 1920, height: 1080 });
         await page.setUserAgent(userAgent);
         await page.goto(product.url, { waitUntil: "networkidle2" });
-        await sleep(5000);
+        await page.screenshot({
+          path: `logs/${now}-${product.name}-${i}.png`,
+        });
+        await page.waitForTimeout(5000);
         await page.close();
       })
   );
 
   browser.close();
-}
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 await initialOpen();

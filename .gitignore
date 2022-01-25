@@ -10,3 +10,5 @@
 # macOS generated files
 .DS_Store
 .DS_Store?
+
+logs/
